@@ -5,32 +5,48 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float movSpeed = 10f;
     [SerializeField] private Transform cameraTransform;
-
-    private float inputV;
-    private float inputH;
+    [SerializeField] private InputManagerSO inputManager;
 
     private CharacterController characterController;
+    private Animator characterAnimator;
+
+
+    private Vector3 movementDirection;
+    private Vector3 inputDirection;
+
+    private void OnEnable()
+    {
+        inputManager.OnMove += OnMove;
+        inputManager.OnJump += OnJump;
+    }
+
+    private void OnMove(Vector2 context)
+    {
+        inputDirection = new Vector3(context.x, 0, context.y);
+        RotateToDestiny();
+    }
+
+    private void OnJump()
+    {
+    }
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         characterController = GetComponent<CharacterController>();
+        characterAnimator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        inputH = Input.GetAxisRaw("Horizontal");
-        inputV = Input.GetAxisRaw("Vertical");
-
-        Vector3 movementDirection = (cameraTransform.forward * inputV + cameraTransform.right * inputH).normalized;
+        movementDirection = cameraTransform.forward * inputDirection.z + cameraTransform.right * inputDirection.x;
+        print(movementDirection * movSpeed * Time.deltaTime);
 
         characterController.Move(movementDirection * movSpeed * Time.deltaTime);
-        
-        if(inputH != 0 || inputV != 0)
-            RotateToDestiny(movementDirection);
+        characterAnimator.SetFloat("MovSpeed", characterController.velocity.magnitude);
     }
     
-    private void RotateToDestiny(Vector3 movementDirection)
+    private void RotateToDestiny()
     {
         Quaternion objectRotation = Quaternion.LookRotation(movementDirection);
         transform.rotation = objectRotation;
