@@ -21,6 +21,8 @@ public class Player : MonoBehaviour
     private Vector3 inputDirection;
     private Vector3 verticalVelocity;
 
+    private bool isGrounded = true;
+
     private void OnEnable()
     {
         inputManager.OnMove += Move;
@@ -34,10 +36,10 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        if (IsGrounded())
+        if (isGrounded)
         {
             verticalVelocity.y = Mathf.Sqrt(-2 * gravityMagnitude * jumpHeight);
-            //characterAnimator.SetTrigger("Jump");
+            characterAnimator.SetTrigger("Jump");
         }
     }
 
@@ -51,30 +53,35 @@ public class Player : MonoBehaviour
     void Update()
     {
         movementDirection = cameraTransform.forward * inputDirection.z + cameraTransform.right * inputDirection.x;
+        movementDirection = new Vector3 (movementDirection.x, 0, movementDirection.z);
 
         characterController.Move(movementDirection * movSpeed * Time.deltaTime);
         characterAnimator.SetFloat("MovSpeed", characterController.velocity.magnitude);
 
-        if (movementDirection.sqrMagnitude > 0)
+
+        if (movementDirection != Vector3.zero)
             RotateToDestiny();
 
-        if(IsGrounded() && verticalVelocity.y < 0)
-            verticalVelocity = Vector3.zero;
-        
         ApplyGravity();
+        IsGrounded();
+
+        characterAnimator.SetBool("isGrounded", isGrounded);
+
+        if (isGrounded && verticalVelocity.y < 0)
+            verticalVelocity = Vector3.zero;
     }
 
 
 
-    private bool IsGrounded()
+    private void IsGrounded()
     {
-        return Physics.CheckSphere(feetTransform.position, groundCheckRadius, groundMask);
+        isGrounded = Physics.CheckSphere(feetTransform.position, groundCheckRadius, groundMask);
     }
 
     private void RotateToDestiny()
     {
         Quaternion objectRotation = Quaternion.LookRotation(movementDirection);
-        transform.rotation = objectRotation;
+        transform.rotation = new Quaternion(0, objectRotation.y, 0, objectRotation.w);
     }
 
     private void ApplyGravity()
