@@ -29,4 +29,9 @@ public class InputManagerSO : ScriptableObject
         OnJump?.Invoke();
     }
 
+    private void OnDisable()
+    {
+        myActions.Player.Disable();
+    }
+
 }
