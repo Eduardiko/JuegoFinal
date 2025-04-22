@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float movSpeed = 10f;
     [SerializeField] private float gravityMagnitude = -9.81f;
-    [SerializeField] private float jumpHeight = 1.5f;
+    [SerializeField] private float jumpHeight = 2.5f;
     [SerializeField] private Transform cameraTransform;
     [SerializeField] private InputManagerSO inputManager;
 
@@ -63,7 +63,7 @@ public class Player : MonoBehaviour
 
 
         movementDirection = cameraTransform.forward * inputDirection.z + cameraTransform.right * inputDirection.x;
-        movementDirection = new Vector3 (movementDirection.x, 0, movementDirection.z);
+        movementDirection = new Vector3 (movementDirection.x, 0, movementDirection.z).normalized;
 
         
         characterController.Move(movementDirection * movSpeed * Time.deltaTime);
@@ -99,7 +99,6 @@ public class Player : MonoBehaviour
     {
         verticalVelocity.y += gravityMagnitude * Time.deltaTime;
         characterController.Move(verticalVelocity * Time.deltaTime);
-        print(verticalVelocity);
     }
 
     private void OnDrawGizmos()

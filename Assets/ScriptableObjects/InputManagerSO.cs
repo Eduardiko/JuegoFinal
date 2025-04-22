@@ -8,6 +8,7 @@ public class InputManagerSO : ScriptableObject
     InputSystem_Actions myActions;
 
     public event Action OnJump;
+    public event Action OnRestart;
     public event Action<Vector2> OnMove;
 
     private void OnEnable()
@@ -15,6 +16,7 @@ public class InputManagerSO : ScriptableObject
         myActions = new InputSystem_Actions();
         myActions.Player.Enable();
         myActions.Player.Jump.started += Jump;
+        myActions.Player.Restart.started += Restart;
         myActions.Player.Move.performed += Move;
         myActions.Player.Move.canceled += Move;
     }
@@ -27,6 +29,11 @@ public class InputManagerSO : ScriptableObject
     private void Jump(InputAction.CallbackContext context)
     {
         OnJump?.Invoke();
+    }
+
+    private void Restart(InputAction.CallbackContext context)
+    {
+        OnRestart?.Invoke();
     }
 
     private void OnDisable()

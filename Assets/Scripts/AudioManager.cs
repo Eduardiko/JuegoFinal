@@ -8,7 +8,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] AudioClip[] clipCollection = new AudioClip[8];
     [SerializeField] AudioClip[] musicClips;
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioSource musicSource;
+    [SerializeField] public AudioSource musicSource;
     private AudioClip currentMusicClip;
 
 
@@ -21,11 +21,12 @@ public class AudioManager : MonoBehaviour
 
         musicSource.loop = true;
         musicSource.spatialBlend = 0f;
-        PlayMusic();
     }
 
-    public void PlaySFX(int clipIndex, float volume = 1f)
+    public void PlaySFX(int clipIndex, float volume = 1f, float pitch = 1f)
     {
+        audioSource.pitch = pitch;
+
         if (clipCollection[clipIndex] != null)
             audioSource.PlayOneShot(clipCollection[clipIndex], volume);
     }

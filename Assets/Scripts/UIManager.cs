@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
 
     private int winStatus = 0;
     private int rollCount = 0;
-    private float remainingTime = 5f;
+    private float remainingTime = 30f;
 
     public static UIManager Instance { get; private set; }
     public TextMeshProUGUI TimeLeft { get => timeLeft; set => timeLeft = value; }
@@ -30,17 +30,30 @@ public class UIManager : MonoBehaviour
     private void OnEnable()
     {
         inputManager.OnJump += Play;
+        inputManager.OnRestart += Restart;
     }
 
     private void Update()
     {
         if (winStatus == 1)
         {
+            if (!winMenu.activeSelf)
+            {
+                AudioManager.Instance.PlaySFX(1, 1f);
+                AudioManager.Instance.musicSource.Stop();
+            }
+            
             player.canMove = false;
             winMenu.SetActive(true);
         }
         else if (winStatus == 2)
         {
+            if (!loseMenu.activeSelf)
+            {
+                AudioManager.Instance.PlaySFX(2, 1f);
+                AudioManager.Instance.musicSource.Stop();
+            }
+
             player.canMove = false;
             loseMenu.SetActive(true);
         }
@@ -53,7 +66,7 @@ public class UIManager : MonoBehaviour
             winStatus = 2;
         }
 
-        if (rollCount == 1)
+        if (rollCount == 40)
             winStatus = 1;
 
         UpdateUI();
@@ -64,16 +77,22 @@ public class UIManager : MonoBehaviour
         if (winStatus == 0)
         {
             startMenu.SetActive(false);
+            AudioManager.Instance.PlayMusic(0);
             player.canMove = true;
         }
         else if (winStatus == 1 || winStatus == 2)
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    private void Restart()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
     private void UpdateUI()
     {
         timeLeft.text = FormatTime(remainingTime);
-        rollsCounter.text = rollCount.ToString() + "/1";
+        rollsCounter.text = rollCount.ToString() + "/40";
     }
 
     public static string FormatTime(float timeInSeconds)
